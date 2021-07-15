@@ -7,17 +7,20 @@ import data.FieldMap;
 import service.annotation.AnnotationFieldService;
 import service.annotation.AnnotationService;
 import java.lang.annotation.Annotation;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class OrmManager {
 
-//    private final JDBCService jdbcService = new JDBCService();
+    private final ConnectToJDBC connectToJDBC = new ConnectToJDBC();
 
     //CREATE
     //UPDATE
-    public void save(Object o) {
+    public void save(Object o) throws SQLException {
         Class<?> aClass = o.getClass();
         System.out.println(aClass.getSimpleName());
         Entity entity = o.getClass().getAnnotation(Entity.class);
@@ -32,6 +35,10 @@ public class OrmManager {
         } else {
             update(id, tableName, o);
         }
+        PreparedStatement statement = connectToJDBC.connect().prepareStatement();
+        statement.executeUpdate("INSERT INTO ? (ID,NAME,AGE) VALUES (?, '?', ?");
+
+
     }
 
     private void create(Class<?> typeId, String tableName, Object o) {
