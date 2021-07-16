@@ -4,7 +4,7 @@ import ann.Column;
 import ann.Entity;
 import ann.Id;
 
-@Entity(name = "user")
+@Entity(name = "Students")
 public class User {
 
     @Id
@@ -25,5 +25,13 @@ public class User {
     public User(String name, int age) {
         this.name = name;
         this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getAge() {
+        return age;
     }
 }

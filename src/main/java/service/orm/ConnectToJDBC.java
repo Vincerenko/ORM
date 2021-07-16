@@ -9,10 +9,10 @@ public class ConnectToJDBC
 public Connection connect (){
 
 
-    Connection c = null;
+    Connection connection = null;
     try {
         Class.forName("org.postgresql.Driver");
-        c = DriverManager
+        connection = DriverManager
                 .getConnection("jdbc:postgresql://localhost:5432/ORM",
                         "postgres", "96321");
     } catch (Exception e) {
@@ -22,7 +22,8 @@ public Connection connect (){
     }
     System.out.println("Opened database successfully");
 
-    return c;
+    return connection;
 }
+
 
 }

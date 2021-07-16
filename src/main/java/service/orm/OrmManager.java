@@ -35,13 +35,20 @@ public class OrmManager {
         } else {
             update(id, tableName, o);
         }
-        PreparedStatement statement = connectToJDBC.connect().prepareStatement();
-        statement.executeUpdate("INSERT INTO ? (ID,NAME,AGE) VALUES (?, '?', ?");
+
+
+//        String id2 = UUID.randomUUID().toString();
+//        PreparedStatement statement = connectToJDBC.connect().prepareStatement("CREATE TABLE ? (?,?,?)");
+//        statement.setString(1,tableName);
+//        statement.setString(2, id2);
+//        statement.setString(3,aClass.getName());
+//        statement.setInt(4,25);
+//        connectToJDBC.connect();
 
 
     }
 
-    private void create(Class<?> typeId, String tableName, Object o) {
+    private void create(Class<?> typeId, String tableName, Object o) throws SQLException {
         Object id = null;
         if (typeId.isAssignableFrom(String.class)) {
             id = UUID.randomUUID().toString();//FIXME
@@ -53,11 +60,23 @@ public class OrmManager {
 
         List<FieldMap> params = new AnnotationFieldService().findColumnMapFields(o);
 
-        String keys = params.stream().map(FieldMap::getKey).collect(Collectors.joining(", "));
+        String keys = params.stream().map(FieldMap::getKey).collect(Collectors.joining(","));
         String values = params.stream().map(it -> it.getValue().toString()).collect(Collectors.joining(", "));
+        String[] strings = keys.split(",");
 
-        String SQL = "INSERT INTO " + tableName + " (id, " + keys + ") VALUES (" + id + ", " + values + ")";
-        System.out.println(SQL);
+        String sql = "CREATE TABLE ? (? VARCHAR(250),? (VARCHAR(250),?(INT))";
+        PreparedStatement preparedStatement = connectToJDBC.connect().prepareStatement(sql);
+        preparedStatement.setString(1, tableName);
+        preparedStatement.setString(2, typeId.getSimpleName());
+        preparedStatement.setString(3,strings[0]);
+        preparedStatement.setString(4,strings[1]);
+
+//        String sql = "CREATE TABLE "+tableName+"(Id VARCHAR(250));";
+//        Statement statement = connectToJDBC.connect().createStatement();
+//        statement.executeUpdate(sql);
+
+        //String SQL = "INSERT INTO " + tableName + " (id, " + keys + ") VALUES (" + id + ", " + values + ")";
+        //System.out.println(SQL);
 //        jdbcService.run(SQL);
     }
 
@@ -87,4 +106,6 @@ public class OrmManager {
     public Object selectAll(Class<Object> c) {
         return null;
     }
+
+
 }
