@@ -1,17 +1,19 @@
 package service.annotation;
 
-import ann.Column;
+import annotations.Column;
 import data.FieldMap;
+import data.FieldMapWithoutValue;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AnnotationFieldService {
+public class AnnotationFieldService
+{
 
     /**
-     * @param o - Объект с которым мы работает
+     * @param o          - Объект с которым мы работает
      * @param annotation Аннотация, по которой мы будем вытаскивать значение переменной
      * @return значение переменной, которая аннотирована "@param annotation"
      */
@@ -35,7 +37,7 @@ public class AnnotationFieldService {
     }
 
     /**
-     * @param fields - поля объекта
+     * @param fields     - поля объекта
      * @param annotation - аннотация, по которой мы будем вытаскивать тип переменной
      * @return тип переменной, которая аннотирована "@param annotation"
      */
@@ -72,6 +74,23 @@ public class AnnotationFieldService {
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     }
+                }
+            }
+        }
+        return fieldMaps;
+    }
+
+    public List<FieldMapWithoutValue> findColumnMapFieldsWithoutValue(Class<?> aClass) {
+        Field[] fields = aClass.getDeclaredFields();
+        List<FieldMapWithoutValue> fieldMaps = new ArrayList<>();
+        for (int i = 0; i < fields.length; i++) {
+            Annotation[] declaredAnnotations = fields[i].getDeclaredAnnotations();
+            for (int j = 0; j < declaredAnnotations.length; j++) {
+                if (declaredAnnotations[j] instanceof Column) {
+                    Field field = fields[i];
+                    Column column = (Column) declaredAnnotations[j];
+                    FieldMapWithoutValue fieldMap = new FieldMapWithoutValue(column.name(), field.getType());
+                    fieldMaps.add(fieldMap);
                 }
             }
         }

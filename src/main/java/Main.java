@@ -1,4 +1,5 @@
 import entities.User;
+import service.orm.CheckDBTable;
 import service.orm.OrmManager;
 
 import java.sql.Connection;
@@ -14,6 +15,8 @@ public class Main
 
         //        Statement statement = c.createStatement();
         //        statement.executeUpdate("CREATE TABLE products (Id INT PRIMARY KEY, ProductName VARCHAR(20), Price INT)");
+        CheckDBTable checkDBTable = new CheckDBTable();
+        checkDBTable.check();
         User user = new User("Many",21);
         OrmManager ormManager = new OrmManager();
         ormManager.save(user);

@@ -1,20 +1,18 @@
 package service.orm;
 
-import ann.Column;
-import ann.Entity;
-import ann.Id;
+import annotations.Entity;
+import annotations.Id;
 import data.FieldMap;
 import service.annotation.AnnotationFieldService;
-import service.annotation.AnnotationService;
-import java.lang.annotation.Annotation;
-import java.sql.PreparedStatement;
+
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class OrmManager {
+public class OrmManager
+{
 
     private final ConnectToJDBC connectToJDBC = new ConnectToJDBC();
 
@@ -32,18 +30,11 @@ public class OrmManager {
         System.out.println("Id = " + id);
         if (id == null) {
             create(idType, tableName, o);
-        } else {
+        }
+        else {
             update(id, tableName, o);
         }
 
-
-//        String id2 = UUID.randomUUID().toString();
-//        PreparedStatement statement = connectToJDBC.connect().prepareStatement("CREATE TABLE ? (?,?,?)");
-//        statement.setString(1,tableName);
-//        statement.setString(2, id2);
-//        statement.setString(3,aClass.getName());
-//        statement.setInt(4,25);
-//        connectToJDBC.connect();
 
 
     }
@@ -57,27 +48,19 @@ public class OrmManager {
             id = (long) UUID.randomUUID().toString().hashCode();//FIXME
         }
         System.out.println(id);
-
         List<FieldMap> params = new AnnotationFieldService().findColumnMapFields(o);
-
-        String keys = params.stream().map(FieldMap::getKey).collect(Collectors.joining(","));
+        String keys = params.stream().map(FieldMap::getKey).collect(Collectors.joining(", "));
         String values = params.stream().map(it -> it.getValue().toString()).collect(Collectors.joining(", "));
         String[] strings = keys.split(",");
 
-        String sql = "CREATE TABLE ? (? VARCHAR(250),? (VARCHAR(250),?(INT))";
-        PreparedStatement preparedStatement = connectToJDBC.connect().prepareStatement(sql);
-        preparedStatement.setString(1, tableName);
-        preparedStatement.setString(2, typeId.getSimpleName());
-        preparedStatement.setString(3,strings[0]);
-        preparedStatement.setString(4,strings[1]);
-
-//        String sql = "CREATE TABLE "+tableName+"(Id VARCHAR(250));";
-//        Statement statement = connectToJDBC.connect().createStatement();
-//        statement.executeUpdate(sql);
-
-        //String SQL = "INSERT INTO " + tableName + " (id, " + keys + ") VALUES (" + id + ", " + values + ")";
-        //System.out.println(SQL);
-//        jdbcService.run(SQL);
+        String SQL = "INSERT INTO " + tableName + " (id, " + keys + ") VALUES (" + id + ", " + values + ")";
+//        try {
+//            Statement statement = connectToJDBC.connect().createStatement();
+//            statement.executeUpdate(sql);
+//        }
+//        catch (SQLException e){
+//            e.printStackTrace();
+//        }
     }
 
     private void update(Object id, String tableName, Object o) {//TODO

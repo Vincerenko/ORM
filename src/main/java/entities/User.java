@@ -1,8 +1,8 @@
 package entities;
 
-import ann.Column;
-import ann.Entity;
-import ann.Id;
+import annotations.Column;
+import annotations.Entity;
+import annotations.Id;
 
 @Entity(name = "Students")
 public class User {
@@ -14,15 +14,15 @@ public class User {
     private String name;
 
     @Column(name = "age")
-    private int age;
+    private Integer age;
 
-    public User(String id, String name, int age) {
+    public User(String id, String name, Integer age) {
         this.id = id;
         this.name = name;
         this.age = age;
     }
 
-    public User(String name, int age) {
+    public User(String name, Integer age) {
         this.name = name;
         this.age = age;
     }
@@ -31,7 +31,7 @@ public class User {
         return name;
     }
 
-    public int getAge() {
+    public Integer getAge() {
         return age;
     }
 }
