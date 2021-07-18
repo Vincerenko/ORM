@@ -39,6 +39,10 @@ public class OrmManager
             } catch (SQLException e) {
                 System.out.println("Sorry...Didn't create");
             }
+
+        }
+        else{
+            update(id,tableName,o);
         }
         return idR;
 
