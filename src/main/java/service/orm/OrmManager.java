@@ -1,109 +1,93 @@
 package service.orm;
 
-import annotations.Entity;
 import annotations.Id;
-import data.FieldMap;
-import service.annotation.AnnotationFieldService;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
-public class OrmManager
+public class OrmManager<T, I> extends AbstractOrmManager<T, I>
 {
-    static {
-        new CheckDBTable().check();
-        System.out.println("Schema was checked");
+    private static final java.util.logging.Logger LOGGER =
+            java.util.logging.Logger.getLogger(CheckDBTable.class.getName());
+
+    public OrmManager(Class<T> clazz, Class<I> idClazz) {
+        super(clazz, idClazz);
     }
 
-    private final ConnectToJDBC connectToJDBC = new ConnectToJDBC();
+    @Override
+    public T save(T object) {
+        Object idValue = annotationFieldService.findFieldValueByAnnotation(object, Id.class);
+        if (idValue == null) {
+            return create(object);
+        }
+        else {
+            return update(idValue, object);
+        }
+    }
 
-    //CREATE
-    //UPDATE
-    public String save(Object o) {
-        String idR = "";
-        Class<?> aClass = o.getClass();
-        System.out.println(aClass.getSimpleName());
-        Entity entity = o.getClass().getAnnotation(Entity.class);
-        String tableName = entity.name();
-        System.out.println("Table name = " + tableName);
-        Class<?> idType = new AnnotationFieldService().findAnnotationFieldType(aClass.getDeclaredFields(), Id.class);
-        Object id = new AnnotationFieldService().findAnnotationField(o, Id.class);
-        System.out.println("Id type = " + idType.getSimpleName());
-        System.out.println("Id = " + id);
-        if (id == null) {
-            try {
-                 idR = create(idType, tableName, o);
-            } catch (SQLException e) {
-                System.out.println("Sorry...Didn't create");
+    @Override
+    public void deleteById(I id) {
+        String sql = "DELETE FROM " + tableName + " WHERE id = '" + id + "'";
+        try (Statement statement = connectToJDBC.connect().createStatement()) {
+            statement.executeUpdate(sql);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    @Override
+    public T getById(I id) {
+        Connection connect = connectToJDBC.connect();
+        T object = null;
+        String sql = "SELECT * FROM " + tableName + " WHERE id = " + "'" + id + "'";
+        try {
+            Statement statement = connect.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+            if (resultSet.next()) {
+                List<String> fieldKeys = annotationFieldService.findColumnKeys(clazz);
+                object = createObject(resultSet, fieldKeys);
             }
 
-        }
-        else{
-            update(id,tableName,o);
-        }
-        return idR;
-
-    }
-
-    private String create(Class<?> typeId, String tableName, Object o) throws SQLException {
-        Object id = null;
-        if (typeId.isAssignableFrom(String.class)) {
-            id = UUID.randomUUID().toString();//FIXME
-        }
-        if (typeId.isAssignableFrom(Number.class)) {
-            id = (long) UUID.randomUUID().toString().hashCode();//FIXME
-        }
-        System.out.println(id);
-        List<FieldMap> params = new AnnotationFieldService().findColumnMapFields(o);
-        String keys = params.stream()
-                .map(FieldMap::getKey)
-                .collect(Collectors.joining(", "));
-        String values = params.stream()
-                .map(it -> "'"+it.getValue().toString()+"'")
-                .collect(Collectors.joining(", "));
-        String[] strings = keys.split(",");
-
-        String SQL = "INSERT INTO " + tableName + " (id, " + keys + ") VALUES (" + "'" + id + "'" + ", " + values + ")";
-        try {
-            Statement statement = connectToJDBC.connect().createStatement();
-            statement.executeUpdate(SQL);
-            statement.close();
-        } catch (SQLException e) {
+        } catch (SQLException | InstantiationException throwables) {
+            throwables.printStackTrace();
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-        return id.toString();
+        finally {
+            try {
+                connect.close();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
+        return object;
     }
 
-    public void update(Object id, String tableName, Object o) {//TODO
-        System.out.println(id);
-
-        List<FieldMap> params = new AnnotationFieldService().findColumnMapFields(o);
-
-        String keys = params.stream().map(FieldMap::getKey).collect(Collectors.joining(", "));
-        String values = params.stream().map(it -> it.getValue().toString()).collect(Collectors.joining(", "));
-
-        String sql = "UPDATE students SET name='Tolik' WHERE name='Many'";
-        String SQL = "UPDATE " + tableName + " (" + keys + ") VALUES (" + values + ")";//TODO
-        System.out.println(SQL);
+    @Override
+    public List<T> selectAll() {
+        List<String> fieldKeys = annotationFieldService.findColumnKeys(clazz);
+        List<T> list = new ArrayList<>();
+        String sql = "SELECT * FROM " + tableName;
+        try {
+            Statement statement = connectToJDBC.connect().createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                try {
+                    T object = createObject(resultSet, fieldKeys);
+                    list.add(object);
+                } catch (InstantiationException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+            statement.close();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return list;
     }
-
-    //DELETE
-    public void deleteById(Long id) {
-
-    }
-
-    //SELECT
-    public Object getById(Long id) {
-        return null;
-    }
-
-    //SELECT
-    public Object selectAll(Class<Object> c) {
-        return null;
-    }
-
 
 }

@@ -1,5 +1,10 @@
 package data;
 
+
+/**
+ *Key Содежржит имя полей
+ *Value содержит значение полей
+ */
 public class FieldMap {
 
     private String key;
