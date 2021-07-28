@@ -10,7 +10,7 @@ public class TestOrmUser {
 
     @Test //GOOD
     public void testCreate(){
-        userRepository.save(new User("San","sss",45));
+        userRepository.save(new User("San","555",54));
     }
 
     @Test //GOOD

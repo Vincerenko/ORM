@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public abstract class AbstractOrmManager<T, I> implements Repository<T, I> {
 
     static {
-        new CheckDBTable().check(); //FIXME
+        new CheckDBTable().check();
     }
 
     protected Class<T> clazz;
@@ -43,11 +43,29 @@ public abstract class AbstractOrmManager<T, I> implements Repository<T, I> {
         if (idClazz.isAssignableFrom(String.class)) {
             id = UUID.randomUUID().toString();//FIXME
         }
-        if (idClazz.isAssignableFrom(Long.class)) {
+        else if (idClazz.isAssignableFrom(Long.class)) {
             id = new Random().nextLong();
         }
-        if (idClazz.isAssignableFrom(Integer.class)) {
-            id = new Random().nextInt();//TODO дописать все типы данных, что могут быть ключами
+        else if (idClazz.isAssignableFrom(Integer.class)) {
+            id = new Random().nextInt();
+        }
+        else if (idClazz.isAssignableFrom(Double.class)) {
+            id = new Random().nextInt();
+        }
+        else if (idClazz.isAssignableFrom(Float.class)) {
+            id = new Random().nextInt();
+        }
+        else if (idClazz.isAssignableFrom(Short.class)) {
+            id = new Random().nextInt();
+        }
+        else if (idClazz.isAssignableFrom(Byte.class)) {
+            id = new Random().nextInt();
+        }
+        else if (idClazz.isAssignableFrom(Boolean.class)) {
+            id = new Random().nextInt();
+        }
+        else if (idClazz.isAssignableFrom(Character.class)) {
+            id = new Random().nextInt();
         }
 
 
@@ -68,6 +86,7 @@ public abstract class AbstractOrmManager<T, I> implements Repository<T, I> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return object;
     }
 

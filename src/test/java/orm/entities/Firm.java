@@ -20,6 +20,10 @@ public class Firm {
     @OneToMany(idName = "user_id")
     private List<User> users;
 
+    public Firm(String name, String power) {
+        this.name = name;
+        this.power = power;
+    }
 
     public Integer getId() {
         return id;
