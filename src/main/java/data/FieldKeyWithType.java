@@ -1,10 +1,16 @@
 package data;
 
-public class FieldMapWithoutValue{
+
+/**
+ * Key Содежржит имя полей
+ * Type содержит тип полей
+ */
+public class FieldKeyWithType
+{
     private String key;
     private Class<?> type;
 
-    public FieldMapWithoutValue(String key, Class<?> type) {
+    public FieldKeyWithType(String key, Class<?> type) {
         this.key = key;
         this.type = type;
     }

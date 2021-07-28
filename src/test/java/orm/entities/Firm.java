@@ -1,11 +1,15 @@
-package entities;
+package orm.entities;
 
 import annotations.Column;
 import annotations.Entity;
 import annotations.Id;
+import annotations.OneToMany;
+
+import java.util.List;
 
 @Entity(name ="Firm")
 public class Firm {
+
     @Id
     private Integer id;
     @Column(name = "name")
@@ -13,10 +17,9 @@ public class Firm {
     @Column(name ="power")
     private String power;
 
-    public Firm(String name, String power) {
-        this.name = name;
-        this.power = power;
-    }
+    @OneToMany(idName = "user_id")
+    private List<User> users;
+
 
     public Integer getId() {
         return id;
