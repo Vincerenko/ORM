@@ -8,11 +8,11 @@ import annotations.OneToMany;
 import java.util.List;
 import java.util.Objects;
 
-@Entity(name ="Firm")
+@Entity(name ="firm")
 public class Firm {
 
     @Id
-    private Integer id;
+    private Long id;
     @Column(name = "name")
     private String name;
     @Column(name ="power")
@@ -26,7 +26,10 @@ public class Firm {
         this.power = power;
     }
 
-    public Integer getId() {
+    public Firm() {
+    }
+
+    public Long getId() {
         return id;
     }
 
@@ -38,6 +41,10 @@ public class Firm {
         return power;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -45,11 +52,21 @@ public class Firm {
         if (o == null || getClass() != o.getClass())
             return false;
         Firm firm = (Firm) o;
-        return Objects.equals(id, firm.id) && Objects.equals(name, firm.name) && Objects.equals(power, firm.power) && Objects.equals(users, firm.users);
+        return Objects.equals(id, firm.id) && Objects.equals(name, firm.name) && Objects.equals(power, firm.power)&& Objects.equals(users, firm.users);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, power, users);
+        return Objects.hash(id, name, power,users);
+    }
+
+    @Override
+    public String toString() {
+        return "Firm{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", power='" + power + '\'' +
+                ", users=" + users +
+                '}';
     }
 }

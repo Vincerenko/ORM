@@ -7,7 +7,7 @@ public class PostgreSqlTypeConverter implements SqlTypeConverter{
     public final Map<Class<?>, String> CONVERTER = new HashMap<Class<?>, String>() {
         {
             put(Integer.class, "INT");//
-            put(Long.class, "INT");//
+            put(Long.class, "BIGINT");//
             put(Double.class, "INT");//
             put(Float.class, "INT");//
             put(Short.class, "INT");//

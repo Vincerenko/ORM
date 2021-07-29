@@ -4,6 +4,7 @@ import annotations.Entity;
 import data.FieldMap;
 import service.annotation.AnnotationFieldService;
 import service.annotation.FieldService;
+import service.configs.OrmConnection;
 
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
@@ -21,21 +22,22 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractOrmManager<T, I> implements Repository<T, I> {
 
-    static {
-        new CheckDBTable().check();
-    }
+
 
     protected Class<T> clazz;
     protected Class<I> idClazz;
     protected String tableName;
+    protected OrmConnection ormConnection;
 
-    public AbstractOrmManager(Class<T> clazz, Class<I> idClazz) {
+    public AbstractOrmManager(Class<T> clazz, Class<I> idClazz, OrmConnection ormConnection) {
         this.clazz = clazz;
         this.idClazz = idClazz;
         this.tableName = clazz.getAnnotation(Entity.class).name();
+        this.ormConnection = ormConnection;
+
     }
 
-    protected final ConnectToJDBC connectToJDBC = new ConnectToJDBC();
+
     protected final AnnotationFieldService annotationFieldService = new AnnotationFieldService();
     protected final FieldService fieldService = new FieldService();
 
@@ -43,10 +45,10 @@ public abstract class AbstractOrmManager<T, I> implements Repository<T, I> {
         Object id = null;
         if (idClazz.isAssignableFrom(String.class)) {
             id = UUID.randomUUID().toString();
-        }
-        else if (idClazz.isAssignableFrom(Long.class)) {
+        }else {
             id = new Random().nextLong();
-        }//generate bd
+        }
+
 
 
 
@@ -60,7 +62,7 @@ public abstract class AbstractOrmManager<T, I> implements Repository<T, I> {
 
         String SQL = "INSERT INTO " + tableName + " (id, " + keys + ") VALUES (" + "'" + id + "'" + ", " + values + ")";
         try {
-            Statement statement = connectToJDBC.connect().createStatement();
+            Statement statement = ormConnection.connect().createStatement();
             statement.executeUpdate(SQL);
             statement.close();
         } catch (SQLException e) {
@@ -89,7 +91,7 @@ public abstract class AbstractOrmManager<T, I> implements Repository<T, I> {
 
             String sql = "UPDATE " + tableName + " SET " + keyValueSql + " WHERE id = '" + id.toString() + "'";
             try {
-                Statement statement = connectToJDBC.connect().createStatement();
+                Statement statement = ormConnection.connect().createStatement();
                 statement.executeUpdate(sql);
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
@@ -119,5 +121,7 @@ public abstract class AbstractOrmManager<T, I> implements Repository<T, I> {
     public abstract void deleteById(I id);
 
     public abstract List<T> selectAll();
+
+    public abstract List<T> saveAll(List<T> list);
 
 }

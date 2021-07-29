@@ -6,6 +6,7 @@ import data.FieldKeyWithType;
 import data.FieldOneToMany;
 import org.reflections.Reflections;
 import service.annotation.AnnotationFieldService;
+import service.configs.OrmConnection;
 import utils.PostgreSqlTypeConverter;
 import utils.SqlTypeConverter;
 
@@ -21,14 +22,18 @@ public class CheckDBTable
 {
     private static final java.util.logging.Logger LOGGER =
             java.util.logging.Logger.getLogger(CheckDBTable.class.getName());
-    private final ConnectToJDBC connectToJDBC = new ConnectToJDBC();
+    private OrmConnection ormConnection ;
     private final SqlTypeConverter sqlTypeConverter = new PostgreSqlTypeConverter();
+
+    public CheckDBTable(OrmConnection ormConnection) {
+        this.ormConnection = ormConnection;
+    }
 
     /**
      * Проверяет создана ли таблица сущности и создает таблицу
      */
     public void check() {
-        Connection connect = connectToJDBC.connect();
+        Connection connect = ormConnection.connect();
         String[] entityPackages = new String[]{"orm.entities"};
         Reflections reflections = new Reflections(entityPackages);
         Set<Class<?>> allClasses = reflections.getTypesAnnotatedWith(Entity.class);
@@ -72,7 +77,6 @@ public class CheckDBTable
                 Statement statement = connect.createStatement();
                 statement.executeUpdate(sql);
             } catch (SQLException e) {
-                e.printStackTrace();
             }
         }
         try {

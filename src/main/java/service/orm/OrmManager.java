@@ -1,6 +1,7 @@
 package service.orm;
 
 import annotations.Id;
+import service.configs.OrmConnection;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -14,8 +15,9 @@ public class OrmManager<T, I> extends AbstractOrmManager<T, I>
     private static final java.util.logging.Logger LOGGER =
             java.util.logging.Logger.getLogger(CheckDBTable.class.getName());
 
-    public OrmManager(Class<T> clazz, Class<I> idClazz) {
-        super(clazz, idClazz);
+    public OrmManager(Class<T> clazz, Class<I> idClazz, OrmConnection ormConnection) {
+        super(clazz, idClazz, ormConnection);
+        new CheckDBTable(ormConnection).check();//FIXME
     }
 
     @Override
@@ -32,7 +34,7 @@ public class OrmManager<T, I> extends AbstractOrmManager<T, I>
     @Override
     public void deleteById(I id) {
         String sql = "DELETE FROM " + tableName + " WHERE id = '" + id + "'";
-        try (Statement statement = connectToJDBC.connect().createStatement()) {
+        try (Statement statement = ormConnection.connect().createStatement()) {
             statement.executeUpdate(sql);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -41,7 +43,7 @@ public class OrmManager<T, I> extends AbstractOrmManager<T, I>
 
     @Override
     public T getById(I id) {
-        Connection connect = connectToJDBC.connect();
+        Connection connect = ormConnection.connect();
         T object = null;
         String sql = "SELECT * FROM " + tableName + " WHERE id = " + "'" + id + "'";
         try {
@@ -56,8 +58,7 @@ public class OrmManager<T, I> extends AbstractOrmManager<T, I>
             throwables.printStackTrace();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             try {
                 connect.close();
             } catch (SQLException throwables) {
@@ -73,7 +74,7 @@ public class OrmManager<T, I> extends AbstractOrmManager<T, I>
         List<T> list = new ArrayList<>();
         String sql = "SELECT * FROM " + tableName;
         try {
-            Statement statement = connectToJDBC.connect().createStatement();
+            Statement statement = ormConnection.connect().createStatement();
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
                 try {
@@ -90,6 +91,20 @@ public class OrmManager<T, I> extends AbstractOrmManager<T, I>
         return list;
     }
 
-    public
+    public void clear(String table) throws SQLException {
+        String sql = "TRUNCATE TABLE " + table + " CASCADE";
+        Statement statement = ormConnection.connect().createStatement();
+        statement.executeUpdate(sql);
+        statement.close();
+    }
+
+    public List<T> saveAll(List<T> list){
+        List<T> tList= new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            T save = save(list.get(i));
+            tList.add(save);
+        }
+        return tList;
+    }
 
 }

@@ -11,8 +11,8 @@ public interface Repository<T, I> {
     T save(T object);
     T getById(I id);
     void deleteById(I id);
-    List<T> selectAll();//TODO переименовать под один формат и посмотреть какие методы мы пропустили
+    List<T> selectAll();
+    List<T> saveAll(List<T> list);
 
-    //saveAll
-    //deleteAll
+
 }
