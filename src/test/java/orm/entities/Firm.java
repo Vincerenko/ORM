@@ -6,6 +6,7 @@ import annotations.Id;
 import annotations.OneToMany;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity(name ="Firm")
 public class Firm {
@@ -35,5 +36,20 @@ public class Firm {
 
     public String getPower() {
         return power;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Firm firm = (Firm) o;
+        return Objects.equals(id, firm.id) && Objects.equals(name, firm.name) && Objects.equals(power, firm.power) && Objects.equals(users, firm.users);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, power, users);
     }
 }

@@ -5,6 +5,7 @@ import data.FieldMap;
 import service.annotation.AnnotationFieldService;
 import service.annotation.FieldService;
 
+import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -41,32 +42,11 @@ public abstract class AbstractOrmManager<T, I> implements Repository<T, I> {
     protected T create(T object) {
         Object id = null;
         if (idClazz.isAssignableFrom(String.class)) {
-            id = UUID.randomUUID().toString();//FIXME
+            id = UUID.randomUUID().toString();
         }
         else if (idClazz.isAssignableFrom(Long.class)) {
             id = new Random().nextLong();
-        }
-        else if (idClazz.isAssignableFrom(Integer.class)) {
-            id = new Random().nextInt();
-        }
-        else if (idClazz.isAssignableFrom(Double.class)) {
-            id = new Random().nextInt();
-        }
-        else if (idClazz.isAssignableFrom(Float.class)) {
-            id = new Random().nextInt();
-        }
-        else if (idClazz.isAssignableFrom(Short.class)) {
-            id = new Random().nextInt();
-        }
-        else if (idClazz.isAssignableFrom(Byte.class)) {
-            id = new Random().nextInt();
-        }
-        else if (idClazz.isAssignableFrom(Boolean.class)) {
-            id = new Random().nextInt();
-        }
-        else if (idClazz.isAssignableFrom(Character.class)) {
-            id = new Random().nextInt();
-        }
+        }//generate bd
 
 
 
@@ -86,6 +66,13 @@ public abstract class AbstractOrmManager<T, I> implements Repository<T, I> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        try {
+            Field idField = fieldService.getIdField(object.getClass().getDeclaredFields());
+            fieldService.setFieldValue(idField,id,object);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+
 
         return object;
     }
