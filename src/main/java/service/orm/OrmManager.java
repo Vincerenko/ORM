@@ -90,4 +90,6 @@ public class OrmManager<T, I> extends AbstractOrmManager<T, I>
         return list;
     }
 
+    public
+
 }

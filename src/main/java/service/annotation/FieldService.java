@@ -90,4 +90,13 @@ public class FieldService {
         }
         throw new NoSuchFieldException();
     }
+
+    public void setFieldValue(Field field, Object value,Object object){
+        field.setAccessible(true);
+        try {
+            field.set(object,value);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
 }
