@@ -22,7 +22,8 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractOrmManager<T, I> implements Repository<T, I> {
 
-
+    private static final java.util.logging.Logger LOGGER =
+            java.util.logging.Logger.getLogger(CheckDBTable.class.getName());
 
     protected Class<T> clazz;
     protected Class<I> idClazz;

@@ -17,19 +17,7 @@ class OrmManagerTest
     private final OrmManager<User, String> ormManagerU = new OrmManager<>(User.class, String.class, new ConnectToJDBC());
     private final OrmManager<Firm, Long> ormManagerF = new OrmManager<>(Firm.class, Long.class, new ConnectToJDBC());
 
-    //    @org.junit.jupiter.api.BeforeAll
-    //    void setUp() {
-    //        ormManagerU =
-    //        ormManagerF =
-    //    }
-    //
-    //
-    //
-    //    @org.junit.jupiter.api.AfterAll
-    //    void tearDown() {
-    //        ormManagerU = null;
-    //        ormManagerF = null;
-    //    }
+
     @AfterEach
     void clear() throws SQLException {
         ormManagerU.clear("students");
@@ -49,11 +37,9 @@ class OrmManagerTest
     @Test
     void saveUser() {
         User user = new User("Vasy", "Sanin", 100);
-
         ormManagerU.save(user);
-        User user1 = (User) ormManagerU.getById(user.getId());
-
-        assertEquals(user.getName(), user1.getName());
+        User user1 = ormManagerU.getById(user.getId());
+        assertEquals(user, user1);
     }
 
     @Test

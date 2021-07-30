@@ -24,9 +24,12 @@ public class OrmManager<T, I> extends AbstractOrmManager<T, I>
     public T save(T object) {
         Object idValue = annotationFieldService.findFieldValueByAnnotation(object, Id.class);
         if (idValue == null) {
+            LOGGER.info("Object was created");
             return create(object);
+
         }
         else {
+            LOGGER.info("Object was updated");
             return update(idValue, object);
         }
     }
@@ -36,6 +39,7 @@ public class OrmManager<T, I> extends AbstractOrmManager<T, I>
         String sql = "DELETE FROM " + tableName + " WHERE id = '" + id + "'";
         try (Statement statement = ormConnection.connect().createStatement()) {
             statement.executeUpdate(sql);
+            LOGGER.info("Object was deleted");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -65,6 +69,7 @@ public class OrmManager<T, I> extends AbstractOrmManager<T, I>
                 throwables.printStackTrace();
             }
         }
+        LOGGER.info("Object was deleted by Id");
         return object;
     }
 
@@ -104,6 +109,7 @@ public class OrmManager<T, I> extends AbstractOrmManager<T, I>
             T save = save(list.get(i));
             tList.add(save);
         }
+        LOGGER.info("DataBase is clear");
         return tList;
     }
 

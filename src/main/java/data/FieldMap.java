@@ -3,6 +3,7 @@ package data;
 
 /**
  *Key Содежржит имя полей
+ * <b>
  *Value содержит значение полей
  */
 public class FieldMap {
